@@ -1,10 +1,13 @@
 const Sequelize = require("sequelize");
 
+const logEnable =
+  process.env.NODE_ENV === "development" ? {} : { logging: false };
+
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   define: {
     timestamps: true,
   },
-  logging: false,
+  ...logEnable,
 });
 
 const User = sequelize.define(

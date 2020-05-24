@@ -17,15 +17,12 @@ module.exports = (io) => {
       }).then((user) => {
         if (user === null) {
           // No such user found
-          console.log("User not found");
         } else {
           // User found
-          console.log("User found with this email");
-          console.log(user);
           bcrypt.compare(data.password, user.password, (e, result) => {
-            console.log("hash === password is ", result);
             if (result) {
               delete user.password;
+              socket.join(user.id);
               // Return jwt,user
               jwt.sign(
                 user,
@@ -62,17 +59,16 @@ module.exports = (io) => {
       }).then((res) => {
         if (res === null) {
           // Can create
-          console.log("Creating User");
           bcrypt.hash(
             data.password,
             parseInt(process.env.SALT_ROUNDS),
             (e, hash) => {
-              console.log(data.password, " hashed is ", hash);
               User.create({
                 email: data.email,
                 password: hash,
               }).then(({ dataValues }) => {
                 delete dataValues.password;
+                socket.join(dataValues.id);
                 jwt.sign(
                   dataValues,
                   process.env.JWT_SECRET,
@@ -90,7 +86,6 @@ module.exports = (io) => {
           );
         } else {
           // Email already exists
-          console.log("Email already registered");
           respond({
             success: false,
             error: "Email already exists",

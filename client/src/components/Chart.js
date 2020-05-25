@@ -1,13 +1,13 @@
-import React from "react";
 import { useTheme } from "@material-ui/core/styles";
+import React from "react";
 import {
-  LineChart,
+  CartesianGrid,
+  Label,
   Line,
+  LineChart,
+  ResponsiveContainer,
   XAxis,
   YAxis,
-  Label,
-  ResponsiveContainer,
-  CartesianGrid,
 } from "recharts";
 import Title from "./Title";
 

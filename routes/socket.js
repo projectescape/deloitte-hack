@@ -1,4 +1,4 @@
-const { User } = require("../services/db");
+const { User, Blood, Breath, Heart } = require("../services/db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
@@ -8,14 +8,18 @@ module.exports = (io) => {
 
     // Fetch profile from jwt
     socket.on("user.profile", (data, respond) => {
-      console.log(data.jwt);
       jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
           respond(null);
         } else {
+          socket.join(decoded.id);
           respond({ user: decoded, token: data.jwt });
         }
       });
+    });
+
+    socket.on("user.logout", (data) => {
+      socket.leave(data);
     });
 
     // User Login
@@ -106,6 +110,117 @@ module.exports = (io) => {
             success: false,
             error: "Email already exists",
           });
+        }
+      });
+    });
+
+    socket.on("heart.ping", (data) => {
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          console.log("Error verifying jwt");
+        } else {
+          socket.broadcast.to(decoded.id).emit("heart.ping", data.value);
+        }
+      });
+    });
+    socket.on("breath.ping", (data) => {
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          console.log("Error verifying jwt");
+        } else {
+          socket.broadcast.to(decoded.id).emit("breath.ping", data.value);
+        }
+      });
+    });
+    socket.on("blood.ping", (data) => {
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          console.log("Error verifying jwt");
+        } else {
+          socket.broadcast.to(decoded.id).emit("blood.ping", data.value);
+        }
+      });
+    });
+
+    socket.on("heart.fetch", (data, respond) => {
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          console.log("Error verifying jwt");
+          respond({ data: [] });
+        } else {
+          Heart.findAll({
+            where: {
+              userID: decoded.id,
+            },
+            order: [["createdAt", "DESC"]],
+            raw: true,
+          }).then((data) => {
+            respond({ data });
+          });
+        }
+      });
+    });
+    socket.on("breath.fetch", (data, respond) => {
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          console.log("Error verifying jwt");
+          respond({ data: [] });
+        } else {
+          Breath.findAll({
+            where: {
+              userID: decoded.id,
+            },
+            order: [["createdAt", "DESC"]],
+            raw: true,
+          }).then((data) => {
+            respond({ data });
+          });
+        }
+      });
+    });
+    socket.on("blood.fetch", (data, respond) => {
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          console.log("Error verifying jwt");
+          respond({ data: [] });
+        } else {
+          Blood.findAll({
+            where: {
+              userID: decoded.id,
+            },
+            order: [["createdAt", "DESC"]],
+            raw: true,
+          }).then((data) => {
+            respond({ data });
+          });
+        }
+      });
+    });
+
+    socket.on("heart.store", (data) => {
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          console.log("Error verifying jwt");
+        } else {
+          Heart.create({ userID: decoded.id, ...data.values });
+        }
+      });
+    });
+    socket.on("breath.store", (data) => {
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          console.log("Error verifying jwt");
+        } else {
+          Breath.create({ userID: decoded.id, ...data.values });
+        }
+      });
+    });
+    socket.on("blood.store", (data) => {
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          console.log("Error verifying jwt");
+        } else {
+          Blood.create({ userID: decoded.id, ...data.values });
         }
       });
     });

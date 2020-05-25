@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import socket from "./services/socket";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import Dashboard from "./pages/Dashboard";
 import Landing from "./pages/Landing";
+import socket from "./services/socket";
 
 const Routes = () => {
   const [profile, setProfile] = useState(null);
@@ -69,6 +69,7 @@ const Routes = () => {
       <Dashboard
         logout={() => {
           setSpinner(false);
+          socket.emit("user.logout", profile.id);
           setProfile(null);
           localStorage.setItem("jwt", null);
           setView("landing");

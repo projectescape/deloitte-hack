@@ -51,6 +51,51 @@ const User = sequelize.define(
   }
 );
 
-// sequelize.sync({ force: true });
+const Blood = sequelize.define("blood", {
+  avg: { type: Sequelize.FLOAT, allowNull: false },
+  min: { type: Sequelize.FLOAT, allowNull: false },
+  max: { type: Sequelize.FLOAT, allowNull: false },
+  avg1: { type: Sequelize.FLOAT, allowNull: false },
+  min1: { type: Sequelize.FLOAT, allowNull: false },
+  max1: { type: Sequelize.FLOAT, allowNull: false },
+});
+const Heart = sequelize.define("heart", {
+  avg: { type: Sequelize.FLOAT, allowNull: false },
+  min: { type: Sequelize.FLOAT, allowNull: false },
+  max: { type: Sequelize.FLOAT, allowNull: false },
+});
+const Breath = sequelize.define("breath", {
+  avg: { type: Sequelize.FLOAT, allowNull: false },
+  min: { type: Sequelize.FLOAT, allowNull: false },
+  max: { type: Sequelize.FLOAT, allowNull: false },
+});
 
-module.exports = { User };
+User.hasMany(Blood, {
+  foreignKey: "userID",
+});
+User.hasMany(Heart, {
+  foreignKey: "userID",
+});
+User.hasMany(Breath, {
+  foreignKey: "userID",
+});
+Blood.belongsTo(User, {
+  foreignKey: "userID",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Heart.belongsTo(User, {
+  foreignKey: "userID",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+Breath.belongsTo(User, {
+  foreignKey: "userID",
+  onDelete: "CASCADE",
+  onUpdate: "CASCADE",
+});
+
+// sequelize.sync({ force: true });
+sequelize.sync();
+
+module.exports = { User, Blood, Breath, Heart };

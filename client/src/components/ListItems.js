@@ -1,16 +1,15 @@
-import React from "react";
+import Divider from "@material-ui/core/Divider";
+import List from "@material-ui/core/List";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import DashboardIcon from "@material-ui/icons/Dashboard";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import InvertColorsIcon from "@material-ui/icons/InvertColors";
-import List from "@material-ui/core/List";
-import Divider from "@material-ui/core/Divider";
-
 import RecordVoiceOverIcon from "@material-ui/icons/RecordVoiceOver";
+import React from "react";
 
-import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 export default function ListItems({ setView, view, logout }) {
   return (
     <>

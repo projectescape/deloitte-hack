@@ -1,22 +1,22 @@
-import React, { useState, useEffect } from "react";
-import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Drawer from "@material-ui/core/Drawer";
 import AppBar from "@material-ui/core/AppBar";
+import Container from "@material-ui/core/Container";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import Divider from "@material-ui/core/Divider";
+import Drawer from "@material-ui/core/Drawer";
+import Grid from "@material-ui/core/Grid";
+import IconButton from "@material-ui/core/IconButton";
+import Paper from "@material-ui/core/Paper";
+import { makeStyles } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
-import Divider from "@material-ui/core/Divider";
-import IconButton from "@material-ui/core/IconButton";
-import Container from "@material-ui/core/Container";
-import Grid from "@material-ui/core/Grid";
-import Paper from "@material-ui/core/Paper";
-import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
-import ListItems from "../components/ListItems";
+import MenuIcon from "@material-ui/icons/Menu";
+import clsx from "clsx";
+import React, { useEffect, useState } from "react";
 import Chart from "../components/Chart";
 import CurrentBox from "../components/CurrentBox";
 import History from "../components/History";
+import ListItems from "../components/ListItems";
 import socket from "../services/socket";
 
 function createData(arr, amount, amount1 = undefined) {
@@ -29,39 +29,20 @@ export default function Dashboard({ logout }) {
   const classes = useStyles();
   const [open, setOpen] = useState(true);
   const [view, setView] = useState("overview");
-  const [heartData, setHeartData] = useState([
-    { amount: 50 },
-    { amount: 70 },
-    { amount: 85 },
-    { amount: 100 },
-    { amount: 140 },
-  ]);
-  const [bloodData, setBloodData] = useState([
-    { amount: 50, amount1: 60 },
-    { amount: 70, amount1: 80 },
-    { amount: 40, amount1: 30 },
-    { amount: 135, amount1: 95 },
-    { amount: 115, amount1: 85 },
-    { amount: 125, amount1: 75 },
-  ]);
-  const [breathData, setBreathData] = useState([
-    { amount: 50 },
-    { amount: 70 },
-    { amount: 40 },
-    { amount: 20 },
-    { amount: 30 },
-  ]);
+  const [heartData, setHeartData] = useState([{ amount: 0 }]);
+  const [bloodData, setBloodData] = useState([{ amount: 0, amount1: 0 }]);
+  const [breathData, setBreathData] = useState([{ amount: 0 }]);
 
   useEffect(() => {
     socket.on("heart.ping", (data) => {
-      setHeartData((heartData) => createData(heartData, ...data));
+      setHeartData((heartData) => createData(heartData, data));
     });
 
-    socket.on("breath.data", (data) => {
-      setBreathData((breathData) => createData(breathData, ...data));
+    socket.on("breath.ping", (data) => {
+      setBreathData((breathData) => createData(breathData, data));
     });
 
-    socket.on("blood.data", (data) => {
+    socket.on("blood.ping", (data) => {
       setBloodData((bloodData) => createData(bloodData, ...data));
     });
     return () => {

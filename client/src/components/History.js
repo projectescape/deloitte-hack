@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -6,8 +5,9 @@ import TableBody from "@material-ui/core/TableBody";
 import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import Title from "./Title";
+import React, { useEffect, useState } from "react";
 import socket from "../services/socket";
+import Title from "./Title";
 
 function preventDefault(event) {
   event.preventDefault();
@@ -20,32 +20,30 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function History({ title, blood, view }) {
-  const classes = useStyles();
+  // const classes = useStyles();
   const [data, setData] = useState([]);
-  const [params, setParams] = useState({
-    offset: 0,
-    pending: false,
-  });
+  // const [params, setParams] = useState({
+  //   offset: 0,
+  //   pending: false,
+  // });
 
   useEffect(() => {
     socket.emit(
-      `fetch.${view}`,
+      `${view}.fetch`,
       {
-        offset: 0,
+        jwt: localStorage.getItem("jwt"),
       },
       (response) => {
         setData(response.data);
-        setParams(response.params);
+        // setParams(response.params);
       }
     );
-    console.log("mounted");
     return () => {
-      console.log("unmounted");
       setData([]);
-      setParams({
-        offset: 0,
-        pending: false,
-      });
+      // setParams({
+      //   offset: 0,
+      //   pending: false,
+      // });
     };
   }, [view]);
 
@@ -77,22 +75,22 @@ export default function History({ title, blood, view }) {
               <TableCell> {row.min} </TableCell>
               {blood && (
                 <>
-                  <TableCell> {row.avg} </TableCell>
-                  <TableCell> {row.max} </TableCell>
-                  <TableCell> {row.min} </TableCell>
+                  <TableCell> {row.avg1} </TableCell>
+                  <TableCell> {row.max1} </TableCell>
+                  <TableCell> {row.min1} </TableCell>
                 </>
               )}
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      {params.pending && (
+      {/* {params.pending && (
         <div className={classes.seeMore}>
           <Link color="primary" href="#" onClick={preventDefault}>
             See more history
           </Link>
         </div>
-      )}
+      )} */}
     </React.Fragment>
   );
 }

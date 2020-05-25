@@ -16,7 +16,7 @@ export default function Chart({ title, yLabel, blood = false, data }) {
 
   return (
     <>
-      <Title>{title}</Title>
+      <Title color={theme.palette.info.main}>{title}</Title>
       <ResponsiveContainer>
         <LineChart
           data={data}

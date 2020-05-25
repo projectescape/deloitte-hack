@@ -6,6 +6,18 @@ module.exports = (io) => {
   io.on("connection", (socket) => {
     console.log("a user connected");
 
+    // Fetch profile from jwt
+    socket.on("user.profile", (data, respond) => {
+      console.log(data.jwt);
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+          respond(null);
+        } else {
+          respond({ user: decoded, token: data.jwt });
+        }
+      });
+    });
+
     // User Login
     socket.on("user.login", (data, respond) => {
       //   Check if details are right, password correct
@@ -17,6 +29,10 @@ module.exports = (io) => {
       }).then((user) => {
         if (user === null) {
           // No such user found
+          respond({
+            success: false,
+            error: "Wrong username/pasword",
+          });
         } else {
           // User found
           bcrypt.compare(data.password, user.password, (e, result) => {
@@ -30,7 +46,7 @@ module.exports = (io) => {
                 { algorithm: "HS256" },
                 (err, token) => {
                   respond({
-                    sucess: true,
+                    success: true,
                     token,
                     user,
                   });
@@ -39,7 +55,7 @@ module.exports = (io) => {
             } else {
               // Manage wrong password
               respond({
-                sucess: false,
+                success: false,
                 error: "Wrong username/pasword",
               });
             }
@@ -64,7 +80,7 @@ module.exports = (io) => {
             parseInt(process.env.SALT_ROUNDS),
             (e, hash) => {
               User.create({
-                email: data.email,
+                ...data,
                 password: hash,
               }).then(({ dataValues }) => {
                 delete dataValues.password;
@@ -75,7 +91,7 @@ module.exports = (io) => {
                   { algorithm: "HS256" },
                   (err, token) => {
                     respond({
-                      sucess: true,
+                      success: true,
                       token,
                       user: dataValues,
                     });

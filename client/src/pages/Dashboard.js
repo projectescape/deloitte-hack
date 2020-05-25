@@ -25,24 +25,31 @@ function createData(arr, amount, amount1 = undefined) {
   return [...arr, { amount, amount1 }];
 }
 
-export default function Dashboard() {
+export default function Dashboard({ logout }) {
   const classes = useStyles();
   const [open, setOpen] = useState(true);
   const [view, setView] = useState("overview");
   const [heartData, setHeartData] = useState([
-    { amount: 50, amount1: 60 },
-    { amount: 70, amount1: 80 },
-    { amount: 40, amount1: 30 },
+    { amount: 50 },
+    { amount: 70 },
+    { amount: 85 },
+    { amount: 100 },
+    { amount: 140 },
   ]);
   const [bloodData, setBloodData] = useState([
     { amount: 50, amount1: 60 },
     { amount: 70, amount1: 80 },
     { amount: 40, amount1: 30 },
+    { amount: 135, amount1: 95 },
+    { amount: 115, amount1: 85 },
+    { amount: 125, amount1: 75 },
   ]);
   const [breathData, setBreathData] = useState([
-    { amount: 50, amount1: 60 },
-    { amount: 70, amount1: 80 },
-    { amount: 40, amount1: 30 },
+    { amount: 50 },
+    { amount: 70 },
+    { amount: 40 },
+    { amount: 20 },
+    { amount: 30 },
   ]);
 
   useEffect(() => {
@@ -121,12 +128,14 @@ export default function Dashboard() {
             setView(view);
           }}
           view={view}
+          logout={logout}
         />
       </Drawer>
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
+            {/* HEART RATE */}
             {(view === "overview" || view === "heart") && (
               <>
                 <Grid item xs={8} lg={9}>
@@ -142,13 +151,22 @@ export default function Dashboard() {
                   <Paper className={fixedHeightPaper}>
                     <CurrentBox
                       title="Current Rate"
-                      value={`80 Beats/min`}
-                      status={"y"}
+                      value={`${
+                        heartData[heartData.length - 1].amount
+                      } Beats/min`}
+                      status={
+                        heartData[heartData.length - 1].amount <= 85
+                          ? "g"
+                          : heartData[heartData.length - 1].amount <= 115
+                          ? "y"
+                          : "r"
+                      }
                     />
                   </Paper>
                 </Grid>
               </>
             )}
+            {/* BREATHING RATE */}
             {(view === "overview" || view === "breath") && (
               <>
                 <Grid item xs={8} lg={9}>
@@ -164,13 +182,22 @@ export default function Dashboard() {
                   <Paper className={fixedHeightPaper}>
                     <CurrentBox
                       title="Current Rate"
-                      value={`80 Breaths/min`}
-                      status={"r"}
+                      value={`${
+                        breathData[breathData.length - 1].amount
+                      }  Breaths/min`}
+                      status={
+                        breathData[breathData.length - 1].amount <= 25
+                          ? "g"
+                          : breathData[breathData.length - 1].amount <= 35
+                          ? "y"
+                          : "r"
+                      }
                     />
                   </Paper>
                 </Grid>
               </>
             )}
+            {/* BLOOD PRESSURE */}
             {(view === "overview" || view === "blood") && (
               <>
                 <Grid item xs={8} lg={9}>
@@ -187,23 +214,36 @@ export default function Dashboard() {
                   <Paper className={fixedHeightPaper}>
                     <CurrentBox
                       title="Current Rate"
-                      value={`80 BPM`}
-                      value1={`75 BPM`}
+                      value={`${bloodData[bloodData.length - 1].amount} mmHg`}
+                      value1={`${bloodData[bloodData.length - 1].amount1} mmHg`}
                       blood={true}
-                      status={"g"}
-                      status1={"r"}
+                      status={
+                        bloodData[bloodData.length - 1].amount <= 120
+                          ? "g"
+                          : bloodData[bloodData.length - 1].amount <= 130
+                          ? "y"
+                          : "r"
+                      }
+                      status1={
+                        bloodData[bloodData.length - 1].amount1 <= 80
+                          ? "g"
+                          : bloodData[bloodData.length - 1].amount1 <= 90
+                          ? "y"
+                          : "r"
+                      }
                     />
                   </Paper>
                 </Grid>
               </>
             )}
-
+            {/* HISTORY */}
             {view !== "overview" && (
               <Grid item xs={12}>
                 <Paper className={classes.paper}>
                   <History
                     blood={view === "blood"}
-                    title={view === "blood" ? "Systolic(mmHg)" : "BPM"}
+                    title={view === "blood" ? "Systolic" : "BPM"}
+                    view={view}
                   />
                 </Paper>
               </Grid>

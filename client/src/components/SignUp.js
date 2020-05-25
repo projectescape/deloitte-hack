@@ -14,8 +14,9 @@ import MenuItem from "@material-ui/core/MenuItem";
 import ArrowBack from "@material-ui/icons/ArrowBack";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
+import socket from "../services/socket";
 
-export default function SignUp() {
+export default function SignUp({ home, setProfile }) {
   const classes = useStyles();
   const [email, setEmail] = useState({
     error: false,
@@ -33,7 +34,7 @@ export default function SignUp() {
   return (
     <>
       <div className={classes.backButton}>
-        <Fab color="primary" aria-label="add">
+        <Fab color="primary" aria-label="add" onClick={home}>
           <ArrowBack />
         </Fab>
       </div>
@@ -50,16 +51,32 @@ export default function SignUp() {
             className={classes.form}
             onSubmit={(e) => {
               e.preventDefault();
-              console.log({
-                password,
-                age,
-                weight,
-                height,
-                sex,
-                fName,
-                lName,
-                email: email.value,
-              });
+              socket.emit(
+                "user.register",
+                {
+                  password,
+                  age,
+                  weight,
+                  height,
+                  sex,
+                  fName,
+                  lName,
+                  email: email.value,
+                },
+                (response) => {
+                  console.log(response);
+                  if (response.success) {
+                    localStorage.setItem("jwt", response.token);
+                    setProfile(response.user);
+                  } else {
+                    setEmail({
+                      ...email,
+                      error: true,
+                      errorMessage: response.error,
+                    });
+                  }
+                }
+              );
             }}
           >
             <Grid container spacing={2}>

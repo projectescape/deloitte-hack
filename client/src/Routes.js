@@ -1,26 +1,81 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import socket from "./services/socket";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import Dashboard from "./pages/Dashboard";
+import Landing from "./pages/Landing";
 
 const Routes = () => {
-  socket.emit("hello", "This is hello message");
+  const [profile, setProfile] = useState(null);
+  const [spinner, setSpinner] = useState(false);
+  const [view, setView] = useState("landing");
+  useEffect(() => {
+    if (profile === null) {
+      setSpinner(true);
 
-  socket.emit(
-    "user.register",
-    {
-      email: "example@google.com",
-      password: "pass1234",
-    },
-    (response) => {
-      console.log(response);
+      console.log("useEffect", profile);
+      setTimeout(() => {
+        setSpinner(false);
+      }, 5000);
+      if (profile === null && localStorage.getItem("jwt")) {
+        socket.emit(
+          "user.profile",
+          {
+            jwt: localStorage.getItem("jwt"),
+          },
+          (response) => {
+            console.log("USER.PROFILE RESPONSE", response);
+            if (response !== null) {
+              setProfile(response.user);
+              localStorage.setItem("jwt", response.token);
+            }
+            setSpinner(false);
+          }
+        );
+      }
     }
-  );
+  }, [profile]);
 
-  return <Dashboard />;
-  return <SignIn />;
-  return <SignUp />;
+  if (profile === null) {
+    if (view === "landing") {
+      return <Landing setView={(val) => setView(val)} spinner={spinner} />;
+    }
+    if (view === "signin") {
+      return (
+        <SignIn
+          home={() => {
+            setView("landing");
+          }}
+          setProfile={(profile) => {
+            setProfile(profile);
+          }}
+        />
+      );
+    }
+    if (view === "register") {
+      return (
+        <SignUp
+          home={() => {
+            setView("landing");
+          }}
+          setProfile={(profile) => {
+            setProfile(profile);
+          }}
+        />
+      );
+    }
+  } else {
+    return (
+      <Dashboard
+        logout={() => {
+          setSpinner(false);
+          setProfile(null);
+          localStorage.setItem("jwt", null);
+          setView("landing");
+        }}
+      />
+    );
+  }
 };
 
 export default Routes;

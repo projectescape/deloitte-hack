@@ -9,8 +9,9 @@ import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import Fab from "@material-ui/core/Fab";
 import ArrowBack from "@material-ui/icons/ArrowBack";
+import socket from "../services/socket";
 
-export default function SignIn() {
+export default function SignIn({ home, setProfile }) {
   const classes = useStyles();
   const [email, setEmail] = useState({
     error: false,
@@ -21,7 +22,7 @@ export default function SignIn() {
   return (
     <>
       <div className={classes.backButton}>
-        <Fab color="primary" aria-label="add">
+        <Fab color="primary" aria-label="add" onClick={home}>
           <ArrowBack />
         </Fab>
       </div>
@@ -38,10 +39,27 @@ export default function SignIn() {
             className={classes.form}
             onSubmit={(e) => {
               e.preventDefault();
-              console.log({
-                password,
-                email: email.value,
-              });
+              socket.emit(
+                "user.login",
+                {
+                  password,
+                  email: email.value,
+                },
+                (response) => {
+                  if (response.success) {
+                    localStorage.setItem("jwt", response.token);
+                    setProfile(response.user);
+                  } else {
+                    setEmail((e) => {
+                      return {
+                        ...e,
+                        error: true,
+                        errorMessage: response.error,
+                      };
+                    });
+                  }
+                }
+              );
             }}
           >
             <TextField
@@ -60,7 +78,7 @@ export default function SignIn() {
               onChange={(e) => {
                 setEmail({
                   error: false,
-                  helperText: "",
+                  errorMessage: "",
                   value: e.target.value,
                 });
               }}

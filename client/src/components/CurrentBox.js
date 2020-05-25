@@ -17,7 +17,7 @@ export default function CurrentBox({
   const classes = useStyles();
   return (
     <React.Fragment>
-      <Title>{title}</Title>
+      <Title color={theme.palette.info.main}>{title}</Title>
       <Typography component="p" variant="h4">
         {value}
       </Typography>
@@ -33,13 +33,14 @@ export default function CurrentBox({
         className={classes.depositContext}
       >
         {blood && (
-          <div
+          <span
             style={{
               color: theme.palette.info.main,
+              display: "block",
             }}
           >
             Systolic
-          </div>
+          </span>
         )}
         {status === "y"
           ? "Slightly High"
@@ -65,13 +66,14 @@ export default function CurrentBox({
             className={classes.depositContext}
           >
             {blood && (
-              <div
+              <span
                 style={{
                   color: theme.palette.success.main,
+                  display: "block",
                 }}
               >
                 Diastolic
-              </div>
+              </span>
             )}
             {status1 === "y"
               ? "Slightly High"

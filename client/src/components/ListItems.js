@@ -11,7 +11,7 @@ import Divider from "@material-ui/core/Divider";
 import RecordVoiceOverIcon from "@material-ui/icons/RecordVoiceOver";
 
 import ExitToAppIcon from "@material-ui/icons/ExitToApp";
-export default function ListItems({ setView, view }) {
+export default function ListItems({ setView, view, logout }) {
   return (
     <>
       <List>
@@ -61,7 +61,7 @@ export default function ListItems({ setView, view }) {
       <List>
         <Divider />
         <div>
-          <ListItem button>
+          <ListItem button onClick={logout}>
             <ListItemIcon>
               <ExitToAppIcon />
             </ListItemIcon>

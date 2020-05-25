@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
@@ -7,53 +7,7 @@ import TableCell from "@material-ui/core/TableCell";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
 import Title from "./Title";
-
-function createData(id, date, name, shipTo, paymentMethod, amount) {
-  return { id, date, name, shipTo, paymentMethod, amount };
-}
-
-const rows = [
-  createData(
-    0,
-    "16 Mar, 2019",
-    "Elvis Presley",
-    "Tupelo, MS",
-    "VISA ⠀•••• 3719",
-    312.44
-  ),
-  createData(
-    1,
-    "16 Mar, 2019",
-    "Paul McCartney",
-    "London, UK",
-    "VISA ⠀•••• 2574",
-    866.99
-  ),
-  createData(
-    2,
-    "16 Mar, 2019",
-    "Tom Scholz",
-    "Boston, MA",
-    "MC ⠀•••• 1253",
-    100.81
-  ),
-  createData(
-    3,
-    "16 Mar, 2019",
-    "Michael Jackson",
-    "Gary, IN",
-    "AMEX ⠀•••• 2000",
-    654.39
-  ),
-  createData(
-    4,
-    "15 Mar, 2019",
-    "Bruce Springsteen",
-    "Long Branch, NJ",
-    "VISA ⠀•••• 5919",
-    212.79
-  ),
-];
+import socket from "../services/socket";
 
 function preventDefault(event) {
   event.preventDefault();
@@ -65,34 +19,80 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function History({ title, blood }) {
+export default function History({ title, blood, view }) {
   const classes = useStyles();
+  const [data, setData] = useState([]);
+  const [params, setParams] = useState({
+    offset: 0,
+    pending: false,
+  });
+
+  useEffect(() => {
+    socket.emit(
+      `fetch.${view}`,
+      {
+        offset: 0,
+      },
+      (response) => {
+        setData(response.data);
+        setParams(response.params);
+      }
+    );
+    console.log("mounted");
+    return () => {
+      console.log("unmounted");
+      setData([]);
+      setParams({
+        offset: 0,
+        pending: false,
+      });
+    };
+  }, [view]);
+
   return (
     <React.Fragment>
       <Title>History</Title>
       <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>{title}</TableCell>
-            {blood && <TableCell>Diastolic(mmHg)</TableCell>}
             <TableCell>Time</TableCell>
+            <TableCell>{`${title} Avg`}</TableCell>
+            <TableCell>{`${title} Max`}</TableCell>
+            <TableCell>{`${title} Min`}</TableCell>
+            {blood && (
+              <>
+                <TableCell>Diastolic Avg</TableCell>
+                <TableCell>Diastolic Max</TableCell>
+                <TableCell>Diastolic Min</TableCell>
+              </>
+            )}
           </TableRow>
         </TableHead>
         <TableBody>
-          {rows.map((row) => (
+          {data.map((row) => (
             <TableRow key={row.id}>
-              <TableCell>{row.date}</TableCell>
-              {blood && <TableCell>{row.name}</TableCell>}
-              <TableCell>{row.shipTo}</TableCell>
+              <TableCell> {row.createdAt} </TableCell>
+              <TableCell> {row.avg} </TableCell>
+              <TableCell> {row.max} </TableCell>
+              <TableCell> {row.min} </TableCell>
+              {blood && (
+                <>
+                  <TableCell> {row.avg} </TableCell>
+                  <TableCell> {row.max} </TableCell>
+                  <TableCell> {row.min} </TableCell>
+                </>
+              )}
             </TableRow>
           ))}
         </TableBody>
       </Table>
-      <div className={classes.seeMore}>
-        <Link color="primary" href="#" onClick={preventDefault}>
-          See more history
-        </Link>
-      </div>
+      {params.pending && (
+        <div className={classes.seeMore}>
+          <Link color="primary" href="#" onClick={preventDefault}>
+            See more history
+          </Link>
+        </div>
+      )}
     </React.Fragment>
   );
 }

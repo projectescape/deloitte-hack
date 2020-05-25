@@ -17,8 +17,32 @@ const User = sequelize.define(
       type: Sequelize.STRING,
       allowNull: false,
     },
+    sex: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    fName: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
+    lName: {
+      type: Sequelize.STRING,
+      allowNull: false,
+    },
     password: {
       type: Sequelize.STRING,
+      allowNull: false,
+    },
+    age: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+    weight: {
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+    height: {
+      type: Sequelize.INTEGER,
       allowNull: false,
     },
   },

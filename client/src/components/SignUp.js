@@ -82,6 +82,7 @@ export default function SignUp({ home, setProfile }) {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
+                  autoFocus
                   autoComplete="fname"
                   name="firstName"
                   variant="outlined"
@@ -89,7 +90,6 @@ export default function SignUp({ home, setProfile }) {
                   fullWidth
                   id="firstName"
                   label="First Name"
-                  autoFocus
                   value={fName}
                   onChange={(e) => {
                     setFName(e.target.value);
@@ -121,7 +121,6 @@ export default function SignUp({ home, setProfile }) {
                   label="Email Address"
                   name="email"
                   autoComplete="email"
-                  autoFocus
                   value={email.value}
                   helperText={email.errorMessage}
                   error={email.error}
@@ -161,7 +160,6 @@ export default function SignUp({ home, setProfile }) {
                   fullWidth
                   id="age"
                   label="Age"
-                  autoFocus
                   autoComplete="age"
                   type="number"
                   vale={age}
@@ -199,7 +197,6 @@ export default function SignUp({ home, setProfile }) {
                   fullWidth
                   id="weight"
                   label="Weight(in Kg)"
-                  autoFocus
                   type="number"
                   vale={weight}
                   onChange={(e) => {

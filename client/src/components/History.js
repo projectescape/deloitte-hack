@@ -1,4 +1,4 @@
-import Link from "@material-ui/core/Link";
+// import Link from "@material-ui/core/Link";
 import { makeStyles } from "@material-ui/core/styles";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
@@ -9,15 +9,15 @@ import React, { useEffect, useState } from "react";
 import socket from "../services/socket";
 import Title from "./Title";
 
-function preventDefault(event) {
-  event.preventDefault();
-}
+// function preventDefault(event) {
+//   event.preventDefault();
+// }
 
-const useStyles = makeStyles((theme) => ({
-  seeMore: {
-    marginTop: theme.spacing(3),
-  },
-}));
+// const useStyles = makeStyles((theme) => ({
+//   seeMore: {
+//     marginTop: theme.spacing(3),
+//   },
+// }));
 
 export default function History({ title, blood, view }) {
   // const classes = useStyles();

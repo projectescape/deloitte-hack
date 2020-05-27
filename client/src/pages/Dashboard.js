@@ -1,4 +1,5 @@
 import AppBar from "@material-ui/core/AppBar";
+import Button from "@material-ui/core/Button";
 import Container from "@material-ui/core/Container";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Divider from "@material-ui/core/Divider";
@@ -6,11 +7,15 @@ import Drawer from "@material-ui/core/Drawer";
 import Grid from "@material-ui/core/Grid";
 import IconButton from "@material-ui/core/IconButton";
 import Paper from "@material-ui/core/Paper";
+import Snackbar from "@material-ui/core/Snackbar";
 import { makeStyles } from "@material-ui/core/styles";
 import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import GetAppIcon from "@material-ui/icons/GetApp";
 import MenuIcon from "@material-ui/icons/Menu";
+import NotificationsIcon from "@material-ui/icons/Notifications";
+import MuiAlert from "@material-ui/lab/Alert";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import Chart from "../components/Chart";
@@ -18,6 +23,10 @@ import CurrentBox from "../components/CurrentBox";
 import History from "../components/History";
 import ListItems from "../components/ListItems";
 import socket from "../services/socket";
+
+function Alert(props) {
+  return <MuiAlert elevation={6} variant="filled" {...props} />;
+}
 
 function createData(arr, amount, amount1 = undefined) {
   if (arr.length < 15) return [...arr, { amount, amount1 }];
@@ -32,6 +41,7 @@ export default function Dashboard({ logout }) {
   const [heartData, setHeartData] = useState([{ amount: 0 }]);
   const [bloodData, setBloodData] = useState([{ amount: 0, amount1: 0 }]);
   const [breathData, setBreathData] = useState([{ amount: 0 }]);
+  const [snackToggle, setSnackToggle] = useState(true);
 
   useEffect(() => {
     socket.on("heart.ping", (data) => {
@@ -89,6 +99,14 @@ export default function Dashboard({ logout }) {
           >
             Dashboard
           </Typography>
+          <IconButton
+            color="inherit"
+            onClick={() => {
+              setSnackToggle((current) => !current);
+            }}
+          >
+            <NotificationsIcon />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -232,6 +250,34 @@ export default function Dashboard({ logout }) {
           </Grid>
         </Container>
       </main>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={snackToggle}
+        onClose={() => {
+          setSnackToggle(false);
+        }}
+        key="top-right"
+      >
+        <Alert
+          onClose={() => {
+            setSnackToggle(false);
+          }}
+          severity="info"
+        >
+          <div>
+            Please download the complementary executable to make run this
+            project
+          </div>
+          <Button
+            variant="contained"
+            color="default"
+            className={classes.button}
+            startIcon={<GetAppIcon />}
+          >
+            Download
+          </Button>
+        </Alert>
+      </Snackbar>
     </div>
   );
 }
@@ -314,5 +360,8 @@ const useStyles = makeStyles((theme) => ({
   },
   fixedHeight: {
     height: 240,
+  },
+  button: {
+    margin: theme.spacing(1),
   },
 }));

@@ -152,10 +152,18 @@ module.exports = (io) => {
             where: {
               userID: decoded.id,
             },
+            offset: data.offset,
+            limit: 10,
             order: [["createdAt", "DESC"]],
             raw: true,
           }).then((data) => {
-            respond({ data });
+            Heart.count({
+              where: {
+                userID: decoded.id,
+              },
+            }).then((total) => {
+              respond({ data, total });
+            });
           });
         }
       });
@@ -170,10 +178,18 @@ module.exports = (io) => {
             where: {
               userID: decoded.id,
             },
+            offset: data.offset,
+            limit: 10,
             order: [["createdAt", "DESC"]],
             raw: true,
           }).then((data) => {
-            respond({ data });
+            Breath.count({
+              where: {
+                userID: decoded.id,
+              },
+            }).then((total) => {
+              respond({ data, total });
+            });
           });
         }
       });
@@ -188,10 +204,18 @@ module.exports = (io) => {
             where: {
               userID: decoded.id,
             },
+            offset: data.offset,
+            limit: 10,
             order: [["createdAt", "DESC"]],
             raw: true,
           }).then((data) => {
-            respond({ data });
+            Blood.count({
+              where: {
+                userID: decoded.id,
+              },
+            }).then((total) => {
+              respond({ data, total });
+            });
           });
         }
       });
@@ -200,27 +224,44 @@ module.exports = (io) => {
     socket.on("heart.store", (data) => {
       jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
-          console.log("Error verifying jwt");
         } else {
-          Heart.create({ userID: decoded.id, ...data.values });
+          Heart.create({ userID: decoded.id, ...data.values }).then(
+            ({ dataValues }) => {
+              socket.broadcast
+                .to(decoded.id)
+                .emit("heart.fetch.ping", dataValues);
+            }
+          );
         }
       });
     });
+
     socket.on("breath.store", (data) => {
       jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
-          console.log("Error verifying jwt");
         } else {
-          Breath.create({ userID: decoded.id, ...data.values });
+          Breath.create({ userID: decoded.id, ...data.values }).then(
+            ({ dataValues }) => {
+              socket.broadcast
+                .to(decoded.id)
+                .emit("breath.fetch.ping", dataValues);
+            }
+          );
         }
       });
     });
+
     socket.on("blood.store", (data) => {
       jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
-          console.log("Error verifying jwt");
         } else {
-          Blood.create({ userID: decoded.id, ...data.values });
+          Blood.create({ userID: decoded.id, ...data.values }).then(
+            ({ dataValues }) => {
+              socket.broadcast
+                .to(decoded.id)
+                .emit("blood.fetch.ping", dataValues);
+            }
+          );
         }
       });
     });

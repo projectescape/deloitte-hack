@@ -13,10 +13,9 @@ const Routes = () => {
     if (profile === null) {
       setSpinner(true);
 
-      console.log("useEffect", profile);
       setTimeout(() => {
         setSpinner(false);
-      }, 5000);
+      }, 2000);
       if (profile === null && localStorage.getItem("jwt")) {
         socket.emit(
           "user.profile",
@@ -24,7 +23,6 @@ const Routes = () => {
             jwt: localStorage.getItem("jwt"),
           },
           (response) => {
-            console.log("USER.PROFILE RESPONSE", response);
             if (response !== null) {
               setProfile(response.user);
               localStorage.setItem("jwt", response.token);

@@ -64,7 +64,6 @@ export default function SignUp({ home, setProfile }) {
                   email: email.value,
                 },
                 (response) => {
-                  console.log(response);
                   if (response.success) {
                     localStorage.setItem("jwt", response.token);
                     setProfile(response.user);

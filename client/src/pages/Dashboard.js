@@ -13,8 +13,8 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import GetAppIcon from "@material-ui/icons/GetApp";
+import InfoIcon from "@material-ui/icons/Info";
 import MenuIcon from "@material-ui/icons/Menu";
-import NotificationsIcon from "@material-ui/icons/Notifications";
 import MuiAlert from "@material-ui/lab/Alert";
 import clsx from "clsx";
 import React, { useEffect, useState } from "react";
@@ -105,7 +105,7 @@ export default function Dashboard({ logout }) {
               setSnackToggle((current) => !current);
             }}
           >
-            <NotificationsIcon />
+            <InfoIcon />
           </IconButton>
         </Toolbar>
       </AppBar>
@@ -165,13 +165,13 @@ export default function Dashboard({ logout }) {
                 </Grid>
               </>
             )}
-            {/* BREATHING RATE */}
+            {/* Respiratory RATE */}
             {(view === "overview" || view === "breath") && (
               <>
                 <Grid item xs={8} lg={9}>
                   <Paper className={fixedHeightPaper}>
                     <Chart
-                      title="Breathing Rate"
+                      title="Respiratory Rate"
                       yLabel="Breaths/min"
                       data={breathData}
                     />

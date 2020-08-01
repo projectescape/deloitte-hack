@@ -273,6 +273,7 @@ export default function Dashboard({ logout }) {
             color="default"
             className={classes.button}
             startIcon={<GetAppIcon />}
+            href="https://github.com/ArpitSingla/Contactless-Monitoring-System"
           >
             Download
           </Button>

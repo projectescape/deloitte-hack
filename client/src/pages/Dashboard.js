@@ -265,7 +265,7 @@ export default function Dashboard({ logout }) {
           severity="info"
         >
           <div>
-            Please download the complementary executable to make run this
+            Please download the complementary executable file to run this
             project
           </div>
           <Button

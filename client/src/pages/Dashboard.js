@@ -1,5 +1,8 @@
 import AppBar from "@material-ui/core/AppBar";
+import Backdrop from "@material-ui/core/Backdrop";
 import Button from "@material-ui/core/Button";
+import Card from "@material-ui/core/Card";
+import CardContent from "@material-ui/core/CardContent";
 import Container from "@material-ui/core/Container";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import Divider from "@material-ui/core/Divider";
@@ -42,6 +45,8 @@ export default function Dashboard({ logout }) {
   const [bloodData, setBloodData] = useState([{ amount: 0, amount1: 0 }]);
   const [breathData, setBreathData] = useState([{ amount: 0 }]);
   const [snackToggle, setSnackToggle] = useState(true);
+  const [eyeblink, setEyeBlink] = useState(false);
+  const [alcohol, setAlcohol] = useState(false);
 
   useEffect(() => {
     socket.on("heart.ping", (data) => {
@@ -55,10 +60,21 @@ export default function Dashboard({ logout }) {
     socket.on("blood.ping", (data) => {
       setBloodData((bloodData) => createData(bloodData, ...data));
     });
+
+    socket.on("alcohol.ping", (data) => {
+      setAlcohol(data);
+    });
+
+    socket.on("eyeBlink.ping", (data) => {
+      setEyeBlink(data);
+    });
+
     return () => {
       socket.off("heart.ping");
       socket.off("breath.ping");
       socket.off("blood.ping");
+      socket.off("alcohol.ping");
+      socket.off("eyeBlink.ping");
     };
   }, []);
 
@@ -130,126 +146,164 @@ export default function Dashboard({ logout }) {
           logout={logout}
         />
       </Drawer>
-      <main className={classes.content}>
-        <div className={classes.appBarSpacer} />
-        <Container maxWidth="lg" className={classes.container}>
-          <Grid container spacing={3}>
-            {/* HEART RATE */}
-            {(view === "overview" || view === "heart") && (
-              <>
-                <Grid item xs={8} lg={9}>
-                  <Paper className={fixedHeightPaper}>
-                    <Chart
-                      title="Heart Rate"
-                      yLabel="Beats/min"
-                      data={heartData}
+      {alcohol ? (
+        <Backdrop className={classes.backdrop} open={true}>
+          <Card variant="outlined">
+            <CardContent>
+              <Typography variant="h5" component="h2">
+                Warning
+              </Typography>
+              <Typography className={classes.pos} color="textSecondary">
+                Alcohol detected
+              </Typography>
+              <Typography variant="body2" component="p">
+                Alcohol level detected is more than permissable, not allowed to
+                drive.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Backdrop>
+      ) : eyeblink ? (
+        <Backdrop className={classes.backdrop} open={true}>
+          <Card variant="outlined">
+            <CardContent>
+              <Typography variant="h5" component="h2">
+                Warning
+              </Typography>
+              <Typography className={classes.pos} color="textSecondary">
+                Drowsiness detected
+              </Typography>
+              <Typography variant="body2" component="p">
+                Driver's eyes closed for an unusually long time. Please take a
+                break if drowsy.
+              </Typography>
+            </CardContent>
+          </Card>
+        </Backdrop>
+      ) : (
+        <main className={classes.content}>
+          <div className={classes.appBarSpacer} />
+          <Container maxWidth="lg" className={classes.container}>
+            <Grid container spacing={3}>
+              {/* HEART RATE */}
+              {(view === "overview" || view === "heart") && (
+                <>
+                  <Grid item xs={8} lg={9}>
+                    <Paper className={fixedHeightPaper}>
+                      <Chart
+                        title="Heart Rate"
+                        yLabel="Beats/min"
+                        data={heartData}
+                      />
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={4} lg={3}>
+                    <Paper className={fixedHeightPaper}>
+                      <CurrentBox
+                        title="Current Rate"
+                        value={`${
+                          heartData[heartData.length - 1].amount
+                        } Beats/min`}
+                        status={
+                          heartData[heartData.length - 1].amount <= 85
+                            ? "g"
+                            : heartData[heartData.length - 1].amount <= 115
+                            ? "y"
+                            : "r"
+                        }
+                      />
+                    </Paper>
+                  </Grid>
+                </>
+              )}
+              {/* Respiratory RATE */}
+              {(view === "overview" || view === "breath") && (
+                <>
+                  <Grid item xs={8} lg={9}>
+                    <Paper className={fixedHeightPaper}>
+                      <Chart
+                        title="Respiratory Rate"
+                        yLabel="Breaths/min"
+                        data={breathData}
+                      />
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={4} lg={3}>
+                    <Paper className={fixedHeightPaper}>
+                      <CurrentBox
+                        title="Current Rate"
+                        value={`${
+                          breathData[breathData.length - 1].amount
+                        }  Breaths/min`}
+                        status={
+                          breathData[breathData.length - 1].amount <= 25
+                            ? "g"
+                            : breathData[breathData.length - 1].amount <= 35
+                            ? "y"
+                            : "r"
+                        }
+                      />
+                    </Paper>
+                  </Grid>
+                </>
+              )}
+              {/* BLOOD PRESSURE */}
+              {(view === "overview" || view === "blood") && (
+                <>
+                  <Grid item xs={8} lg={9}>
+                    <Paper className={fixedHeightPaper}>
+                      <Chart
+                        title="Blood Pressure"
+                        yLabel="mmHg"
+                        blood={true}
+                        data={bloodData}
+                      />
+                    </Paper>
+                  </Grid>
+                  <Grid item xs={4} lg={3}>
+                    <Paper className={fixedHeightPaper}>
+                      <CurrentBox
+                        title="Current Rate"
+                        value={`${bloodData[bloodData.length - 1].amount} mmHg`}
+                        value1={`${
+                          bloodData[bloodData.length - 1].amount1
+                        } mmHg`}
+                        blood={true}
+                        status={
+                          bloodData[bloodData.length - 1].amount <= 120
+                            ? "g"
+                            : bloodData[bloodData.length - 1].amount <= 130
+                            ? "y"
+                            : "r"
+                        }
+                        status1={
+                          bloodData[bloodData.length - 1].amount1 <= 80
+                            ? "g"
+                            : bloodData[bloodData.length - 1].amount1 <= 90
+                            ? "y"
+                            : "r"
+                        }
+                      />
+                    </Paper>
+                  </Grid>
+                </>
+              )}
+              {/* HISTORY */}
+              {view !== "overview" && (
+                <Grid item xs={12}>
+                  <Paper className={classes.paper}>
+                    <History
+                      blood={view === "blood"}
+                      title={view === "blood" ? "Systolic" : "BPM"}
+                      view={view}
                     />
                   </Paper>
                 </Grid>
-                <Grid item xs={4} lg={3}>
-                  <Paper className={fixedHeightPaper}>
-                    <CurrentBox
-                      title="Current Rate"
-                      value={`${
-                        heartData[heartData.length - 1].amount
-                      } Beats/min`}
-                      status={
-                        heartData[heartData.length - 1].amount <= 85
-                          ? "g"
-                          : heartData[heartData.length - 1].amount <= 115
-                          ? "y"
-                          : "r"
-                      }
-                    />
-                  </Paper>
-                </Grid>
-              </>
-            )}
-            {/* Respiratory RATE */}
-            {(view === "overview" || view === "breath") && (
-              <>
-                <Grid item xs={8} lg={9}>
-                  <Paper className={fixedHeightPaper}>
-                    <Chart
-                      title="Respiratory Rate"
-                      yLabel="Breaths/min"
-                      data={breathData}
-                    />
-                  </Paper>
-                </Grid>
-                <Grid item xs={4} lg={3}>
-                  <Paper className={fixedHeightPaper}>
-                    <CurrentBox
-                      title="Current Rate"
-                      value={`${
-                        breathData[breathData.length - 1].amount
-                      }  Breaths/min`}
-                      status={
-                        breathData[breathData.length - 1].amount <= 25
-                          ? "g"
-                          : breathData[breathData.length - 1].amount <= 35
-                          ? "y"
-                          : "r"
-                      }
-                    />
-                  </Paper>
-                </Grid>
-              </>
-            )}
-            {/* BLOOD PRESSURE */}
-            {(view === "overview" || view === "blood") && (
-              <>
-                <Grid item xs={8} lg={9}>
-                  <Paper className={fixedHeightPaper}>
-                    <Chart
-                      title="Blood Pressure"
-                      yLabel="mmHg"
-                      blood={true}
-                      data={bloodData}
-                    />
-                  </Paper>
-                </Grid>
-                <Grid item xs={4} lg={3}>
-                  <Paper className={fixedHeightPaper}>
-                    <CurrentBox
-                      title="Current Rate"
-                      value={`${bloodData[bloodData.length - 1].amount} mmHg`}
-                      value1={`${bloodData[bloodData.length - 1].amount1} mmHg`}
-                      blood={true}
-                      status={
-                        bloodData[bloodData.length - 1].amount <= 120
-                          ? "g"
-                          : bloodData[bloodData.length - 1].amount <= 130
-                          ? "y"
-                          : "r"
-                      }
-                      status1={
-                        bloodData[bloodData.length - 1].amount1 <= 80
-                          ? "g"
-                          : bloodData[bloodData.length - 1].amount1 <= 90
-                          ? "y"
-                          : "r"
-                      }
-                    />
-                  </Paper>
-                </Grid>
-              </>
-            )}
-            {/* HISTORY */}
-            {view !== "overview" && (
-              <Grid item xs={12}>
-                <Paper className={classes.paper}>
-                  <History
-                    blood={view === "blood"}
-                    title={view === "blood" ? "Systolic" : "BPM"}
-                    view={view}
-                  />
-                </Paper>
-              </Grid>
-            )}
-          </Grid>
-        </Container>
-      </main>
+              )}
+            </Grid>
+          </Container>
+        </main>
+      )}
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "right" }}
         open={snackToggle}

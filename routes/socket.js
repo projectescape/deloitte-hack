@@ -151,7 +151,7 @@ module.exports = (io) => {
       });
     });
     socket.on("eyeBlink.ping", (data) => {
-      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, ssdecoded) => {
+      jwt.verify(data.jwt, process.env.JWT_SECRET, (err, decoded) => {
         if (err) {
           console.log("Error verifying jwt");
         } else {
